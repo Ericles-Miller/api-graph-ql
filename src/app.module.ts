@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppResolver } from './app.resolver';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UsersModule } from './users/users.module';
@@ -17,6 +16,6 @@ import { dataSourceOptions } from './database/database.provider';
     UsersModule,
   ],
   controllers: [],
-  providers: [AppResolver],
+  providers: [],
 })
 export class AppModule {}
