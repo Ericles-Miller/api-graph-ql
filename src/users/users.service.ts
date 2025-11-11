@@ -1,9 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { FindUserInput } from './dto/find-user.input';
 
 @Injectable()
 export class UsersService {
@@ -23,19 +27,26 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
-  }
+  async findByFilters(filters: FindUserInput): Promise<User[]> {
+    const whereCondition: Partial<User> = {};
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    if (filters.id) whereCondition.id = filters.id;
+    if (filters.email) whereCondition.email = filters.email;
+    if (filters.phone) whereCondition.phone = filters.phone;
+    if (filters.name) whereCondition.name = filters.name;
+    if (filters.isActive !== undefined)
+      whereCondition.isActive = filters.isActive;
+
+    return this.usersRepository.find({ where: whereCondition });
   }
 }
