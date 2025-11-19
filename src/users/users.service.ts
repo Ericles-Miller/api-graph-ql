@@ -1,13 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FindUserInput } from './dto/find-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UsersService {
@@ -44,9 +41,18 @@ export class UsersService {
     if (filters.email) whereCondition.email = filters.email;
     if (filters.phone) whereCondition.phone = filters.phone;
     if (filters.name) whereCondition.name = filters.name;
-    if (filters.isActive !== undefined)
-      whereCondition.isActive = filters.isActive;
+    if (filters.isActive !== undefined) whereCondition.isActive = filters.isActive;
 
     return this.usersRepository.find({ where: whereCondition });
+  }
+
+  async update(id: string, { name, phone }: UpdateUserInput): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (name !== undefined) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+
+    return await this.usersRepository.save(user);
   }
 }
