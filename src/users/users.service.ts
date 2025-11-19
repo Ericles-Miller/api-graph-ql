@@ -55,4 +55,12 @@ export class UsersService {
 
     return await this.usersRepository.save(user);
   }
+
+  async remove(id: string): Promise<boolean> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+
+    await this.usersRepository.remove(user);
+    return true;
+  }
 }

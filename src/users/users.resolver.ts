@@ -33,4 +33,9 @@ export class UsersResolver {
   async updateUser(@Args('id') id: string, @Args('updateUserInput') updateUserInput: UpdateUserInput): Promise<User> {
     return await this.usersService.update(id, updateUserInput);
   }
+
+  @Mutation(() => Boolean)
+  async removeUser(@Args('id') id: string): Promise<boolean> {
+    return await this.usersService.remove(id);
+  }
 }
